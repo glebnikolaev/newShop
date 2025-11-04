@@ -17,7 +17,9 @@ class ProductsController extends Controller
      */
     public function index(): AnonymousResourceCollection
     {
-        $products = Product::isActive()->with('categories', 'options', 'options.parameters', 'options.parameters.variation')->get();
+        $products = Product::isActive()
+            ->with('categories', 'options', 'options.parameters', 'options.parameters.variation')
+            ->get();
         return ProductResource::collection($products);
     }
 }

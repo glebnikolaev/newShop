@@ -8,10 +8,8 @@
                 <div v-for="product in featuredProducts" class="col-sm-6 col-md-4 col-lg-3 p-b-35 isotope-item">
                     <div class="block2">
                         <div class="block2-pic hov-img0">
-                            <img v-lazyload
-                                 src="/photos/1/no-photo.jpg"
-                                 :data-src="product.image"
-                                 :data-err="product.image"
+                            <img
+                                 :src="product.image ? product.image : '/photos/1/no-photo.jpg'"
                                  :alt="product.name"
                             />
                             <a href="#" @click.prevent='openProductModal(product)'
@@ -48,30 +46,35 @@
 </template>
 
 <script>
-    import Vue from 'vue'
-    import axios from 'axios';
-    import VueTinyLazyLoadImg from 'vue-tiny-lazyload-img'
-    Vue.use(VueTinyLazyLoadImg);
+import axios from 'axios';
+import bus from '../bus';
+import { ref, onMounted } from 'vue';
+import { useStore } from 'vuex';
 
-    export default {
-        name: 'featured',
+export default {
+    name: 'featured',
+    setup() {
+        const store = useStore();
+        const featuredProducts = ref([]);
 
-        data() {
-            return {
-                featuredProducts: [],
-            };
-        },
-        mounted() {
+        onMounted(() => {
             axios.get('/api/v1/modules/featured')
                 .then(response => {
-                    this.featuredProducts = response.data.data;
+                    featuredProducts.value = response.data.data;
+                }).catch(() => {
+                    featuredProducts.value = [];
                 });
-        },
-        methods: {
-            openProductModal(product) {
-                this.$store.dispatch('setProduct', product);
-                this.$bus.$emit('toggle-product-modal');
-            }
-        }
+        });
+
+        const openProductModal = (product) => {
+            store.dispatch('setProduct', product);
+            bus.emit('toggle-product-modal');
+        };
+
+        return {
+            featuredProducts,
+            openProductModal,
+        };
     }
+}
 </script>

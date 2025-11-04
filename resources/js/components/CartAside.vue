@@ -14,12 +14,10 @@
             <div class="header-cart-content flex-w js-pscroll">
                 <ul class="header-cart-wrapitem w-full" v-if="cart.count > 0">
 
-                    <li class="header-cart-item flex-w flex-t m-b-12" v-for="(product, productName , index) in cart.data">
+                    <li class="header-cart-item flex-w flex-t m-b-12" v-for="product in cart.data">
                         <div class="header-cart-item-img" @click.prevent='openProductModal(product)'>
-                            <img v-lazyload
-                                 src="/photos/1/no-photo.jpg"
-                                 :data-src="product.image"
-                                 :data-err="product.image"
+                            <img
+                                 :src="product.image ? product.image : '/photos/1/no-photo.jpg'"
                                  :alt="product.name"
 
                             />
@@ -30,8 +28,8 @@
                             <a @click.prevent='openProductModal(product)' class="header-cart-item-name hov-cl1 trans-04">{{ product.name }}</a>
 
                             <span class="header-cart-item-info">
-								{{ product.quantity }} x {{ product.price }}
-							</span>
+						{{ product.quantity }} x {{ product.price }}
+					</span>
                         </div>
                     </li>
                 </ul>
@@ -59,44 +57,46 @@
 </template>
 
 <script>
-    import Vue from 'vue'
-    import VueTinyLazyLoadImg from 'vue-tiny-lazyload-img'
-    Vue.use(VueTinyLazyLoadImg);
+import { ref, onMounted } from 'vue';
+import { useStore } from 'vuex';
+import bus from '../bus';
 
-    export default {
-        name: 'cartAside',
-        data() {
-            return {
-                isVisible: false,
-                selected : null,
-                cart: {
-                    data: {},
-                    count: 0,
-                    subTotal: 0,
-                    total: 0,
-                },
-                shipping: [],
-                payment: [],
+export default {
+    name: 'cartAside',
+    setup() {
+        const store = useStore();
 
-            };
-        },
-        mounted() {
-            this.$bus.$on('toggle-cart-modal', () => {
-                this.isVisible = !this.isVisible;
-                this.cart = this.$store.getters.cart;
+        const isVisible = ref(false);
+        const selected = ref(null);
+        const cart = ref({ data: {}, count: 0, subTotal: 0, total: 0 });
+        const shipping = ref([]);
+        const payment = ref([]);
 
+        onMounted(() => {
+            bus.on('toggle-cart-modal', () => {
+                isVisible.value = !isVisible.value;
+                cart.value = store.getters.cart;
             });
+        });
 
-        },
-        methods: {
-            close() {
-                this.isVisible = !this.isVisible;
-            },
-            openProductModal(product) {
-                this.$store.dispatch('setProduct', product);
-                this.$bus.$emit('toggle-product-modal');
-            }
+        const close = () => {
+            isVisible.value = !isVisible.value;
+        };
 
-        },
+        const openProductModal = (product) => {
+            store.dispatch('setProduct', product);
+            bus.emit('toggle-product-modal');
+        };
+
+        return {
+            isVisible,
+            selected,
+            cart,
+            shipping,
+            payment,
+            close,
+            openProductModal,
+        };
     }
+}
 </script>

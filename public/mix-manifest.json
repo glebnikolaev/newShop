@@ -1,6 +1,19 @@
 {
     "/js/app.js": "/js/app.js",
-    "/css/app.css": "/css/app.css",
+    "/css/main.css": "/css/main.css",
+    "/fonts/Poppins-Light.ttf?be86c23ccc9cb2e1f4f1762a4fcea066": "/fonts/Poppins-Light.ttf?be86c23ccc9cb2e1f4f1762a4fcea066",
+    "/fonts/Poppins-ExtraLight.ttf?e0956b3d1b7f8036e8e213f6b31bc03b": "/fonts/Poppins-ExtraLight.ttf?e0956b3d1b7f8036e8e213f6b31bc03b",
+    "/fonts/Poppins-Medium.ttf?b59f6a636397975c540983a35a5b22f7": "/fonts/Poppins-Medium.ttf?b59f6a636397975c540983a35a5b22f7",
+    "/fonts/Poppins-Italic.ttf?e02f5636f1c9a39682674b7b7ddd952d": "/fonts/Poppins-Italic.ttf?e02f5636f1c9a39682674b7b7ddd952d",
+    "/fonts/Poppins-Bold.ttf?e2abc8f5e9a67ea669ea33339d2bc83a": "/fonts/Poppins-Bold.ttf?e2abc8f5e9a67ea669ea33339d2bc83a",
+    "/fonts/Poppins-SemiBold.ttf?5981b450a68d5134225b3eb6b04d523f": "/fonts/Poppins-SemiBold.ttf?5981b450a68d5134225b3eb6b04d523f",
+    "/fonts/PlayfairDisplay-Regular.ttf?b982583b4edccc394bb41b158f742113": "/fonts/PlayfairDisplay-Regular.ttf?b982583b4edccc394bb41b158f742113",
+    "/fonts/PlayfairDisplay-Bold.ttf?60d3f992e85f8e17f41947c07b217eff": "/fonts/PlayfairDisplay-Bold.ttf?60d3f992e85f8e17f41947c07b217eff",
+    "/fonts/Montserrat-Regular.ttf?7c8ccfe4b8a1b8ea2327e852eea94abe": "/fonts/Montserrat-Regular.ttf?7c8ccfe4b8a1b8ea2327e852eea94abe",
+    "/fonts/Montserrat-Bold.ttf?68c8d686f4b0d91b92f195177e3218c2": "/fonts/Montserrat-Bold.ttf?68c8d686f4b0d91b92f195177e3218c2",
+    "/images/icon-next.png?f2c41fc445006bf65f50a9ee2a952840": "/images/icon-next.png?f2c41fc445006bf65f50a9ee2a952840",
+    "/images/icon-prev.png?91df0250d15475c8602c9e79fa0dd9f0": "/images/icon-prev.png?91df0250d15475c8602c9e79fa0dd9f0",
+    "/images/icon-close.png?4514e3c6e1bf5bc78acadbb6a8350bf4": "/images/icon-close.png?4514e3c6e1bf5bc78acadbb6a8350bf4",
     "/css/util.css": "/css/util.css",
-    "/css/main.css": "/css/main.css"
+    "/css/app.css": "/css/app.css"
 }

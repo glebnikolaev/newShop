@@ -150,62 +150,86 @@
 </template>
 
 <script>
-    import axios from 'axios';
-    export default {
-        name: 'mainNavBar',
-        data() {
-            return {
-                links: [],
-                isFixed: false,
-                windowScrollY: 40,
-                cartCount: 0,
-                isLoggedIn: false,
-            };
-        },
-        created() {
-            window.addEventListener('scroll', this.handleScroll);
-            if (window.Laravel.isLoggedin) {
-                this.isLoggedIn = true
-            }
-        },
-        destroyed() {
-            window.removeEventListener('scroll', this.handleScroll);
-        },
-        mounted() {
-            this.$bus.$on('update-cart-count', () => {
-                this.cartCount = this.$store.getters.cart.count;
+import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { useStore } from 'vuex';
+import { useRouter } from 'vue-router';
+import axios from 'axios';
+import bus from '../bus';
+
+export default {
+    name: 'mainNavBar',
+    setup() {
+        const store = useStore();
+        const router = useRouter();
+
+        const isFixed = ref(false);
+        const windowScrollY = ref(40);
+        const cartCount = ref(0);
+        const isLoggedIn = ref(false);
+
+        const handleScroll = () => {
+            isFixed.value = window.scrollY >= 40;
+            windowScrollY.value = window.scrollY < 40 ? 40 - window.scrollY : 0;
+        };
+
+        const openCartModal = () => {
+            bus.emit('toggle-cart-modal');
+        };
+
+        const logout = (e) => {
+            e.preventDefault();
+            axios.get('/sanctum/csrf-cookie').then(() => {
+                axios.post('/api/v1/logout')
+                    .then(response => {
+                        if (response.data.success) {
+                            // navigate to home
+                            router.push('/');
+                        } else {
+                            console.log(response);
+                        }
+                    })
+                    .catch(function (error) {
+                        console.error(error);
+                    });
             });
-        },
-        computed: {
-            topNavBarLinks() {
-                return this.$store.getters.topNavBarLinks;
-            },
-        },
-        methods: {
-            handleScroll(event) {
-                this.isFixed =  window.scrollY >= 40;
-                this.windowScrollY = window.scrollY < 40 ? 40 - window.scrollY : 0;
-            },
-            openCartModal() {
-                this.$bus.$emit('toggle-cart-modal');
-            },
-            logout(e) {
-                console.log('ss')
-                e.preventDefault()
-                axios.get('/sanctum/csrf-cookie').then(response => {
-                    axios.post('/api/v1/logout')
-                        .then(response => {
-                            if (response.data.success) {
-                                this.$router.go('/')
-                            } else {
-                                console.log(response)
-                            }
-                        })
-                        .catch(function (error) {
-                            console.error(error);
-                        });
-                })
+        };
+
+        const topNavBarLinks = computed(() => store.getters.topNavBarLinks);
+
+        onMounted(() => {
+            window.addEventListener('scroll', handleScroll);
+            if (window.Laravel && window.Laravel.isLoggedin) {
+                isLoggedIn.value = true;
             }
-        }
+
+            // initialize cart count
+            cartCount.value = store.getters.cart ? store.getters.cart.count : 0;
+
+            bus.on('update-cart-count', () => {
+                cartCount.value = store.getters.cart.count;
+            });
+        });
+
+        onUnmounted(() => {
+            window.removeEventListener('scroll', handleScroll);
+            // try to remove bus listener if bus supports off
+            if (bus && typeof bus.off === 'function') {
+                bus.off('update-cart-count');
+            }
+        });
+
+        return {
+            isFixed,
+            windowScrollY,
+            cartCount,
+            isLoggedIn,
+            topNavBarLinks,
+            handleScroll,
+            openCartModal,
+            logout,
+        };
     }
+}
 </script>
+
+

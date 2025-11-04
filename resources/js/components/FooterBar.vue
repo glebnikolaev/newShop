@@ -150,18 +150,21 @@
 </template>
 
 <script>
-    import moment from 'moment'
-    import { mapState } from 'vuex'
+import moment from 'moment'
+import { computed } from 'vue'
+import { useStore } from 'vuex'
 
-    export default {
-        name: 'footerBar',
-        computed: {
-            year () {
-                return moment().year()
-            },
-            ...mapState([
-                'isFooterBarVisible'
-            ])
+export default {
+    name: 'footerBar',
+    setup() {
+        const store = useStore();
+        const year = computed(() => moment().year());
+        const isFooterBarVisible = computed(() => store.state.isFooterBarVisible);
+
+        return {
+            year,
+            isFooterBarVisible,
         }
     }
+}
 </script>

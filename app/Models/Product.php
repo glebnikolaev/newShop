@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Product extends Model
 {
@@ -11,7 +12,7 @@ class Product extends Model
     /**
      * Get the categories record associated with the product.
      */
-    public function images(): \Illuminate\Database\Eloquent\Relations\HasMany
+    public function images(): HasMany
     {
         return $this->hasMany(Image::class);
     }
@@ -35,7 +36,7 @@ class Product extends Model
     /**
      * Get the price record associated with the product.
      */
-    public function variations(): \Illuminate\Database\Eloquent\Relations\HasMany
+    public function variations(): HasMany
     {
         return $this->hasMany(Variation::class)->orderBy('price', 'asc');
     }
@@ -51,7 +52,7 @@ class Product extends Model
     public function scopeByCategory($query, $category)
     {
         if (!is_null($category)) {
-            return $query->whereHas('categories', function($query) use ($category) {
+            return $query->whereHas('categories', function ($query) use ($category) {
                 $query->where('category_id', $category);
             });
         }
@@ -72,7 +73,7 @@ class Product extends Model
     public function scopeFromParentCategory($query, $category)
     {
         if (!is_null($category)) {
-            return $query->whereHas('categories', function($query) use ($category) {
+            return $query->whereHas('categories', function ($query) use ($category) {
                 $query->where('parent_id', $category)->orderBy('sort_order', 'asc');
             });
         }
@@ -92,7 +93,7 @@ class Product extends Model
     public function scopeName($query, $name)
     {
         if (!is_null($name)) {
-            return $query->where('name','like', '%'.$name.'%');
+            return $query->where('name', 'like', '%' . $name . '%');
         }
 
         return $query;
@@ -101,14 +102,12 @@ class Product extends Model
     public function getCastAttribute(): ?string
     {
         $cast = null;
-        if ($this->weight || $this->amount ) {
+        if ($this->weight || $this->amount) {
             if ($this->weight && $this->amount) {
                 $cast = $this->weight . ' гр./' . $this->amount . ' шт';
-            }
-            elseif(!$this->weight && $this->amount) {
+            } elseif (!$this->weight && $this->amount) {
                 $cast = $this->amount . ' шт';
-            }
-            elseif($this->weight && !$this->amount) {
+            } elseif ($this->weight && !$this->amount) {
                 $cast = $this->weight . ' гр.';
             }
         }

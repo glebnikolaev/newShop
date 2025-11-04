@@ -25,18 +25,25 @@
 
 <script>
 import axios from 'axios';
-    export default {
-        name: 'banners',
-        data() {
-            return {
-                banners: {},
-            };
-        },
-        mounted() {
+import { ref, onMounted } from 'vue';
+
+export default {
+    name: 'banners',
+    setup() {
+        const banners = ref([]);
+
+        onMounted(() => {
             axios.get('/api/v1/banners')
                 .then(response => {
-                    this.banners = response.data.data;
+                    banners.value = response.data.data;
+                }).catch(() => {
+                    banners.value = [];
                 });
-        }
+        });
+
+        return {
+            banners,
+        };
     }
+}
 </script>

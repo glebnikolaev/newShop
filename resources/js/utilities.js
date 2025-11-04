@@ -1,6 +1,8 @@
+import bus from './bus';
+
 export default {
     alert(message, danger) {
-        this.$bus.$emit('alert', {message, danger});
+        bus.emit('alert', {message, danger});
     },
 
     addToCart(key, value) {
@@ -26,12 +28,17 @@ export default {
 
     getUrlParam(name) {
         let url = window.location.href;
-        name = name.replace(/[\[\]]/g, "\\$&");
+        name = name.replace(/[[\]]/g, "\\$&");
         let regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
             results = regex.exec(url);
 
-        if (!results) return '';
-        if (!results[2]) return '';
+        if (!results) {
+            return '';
+        }
+
+        if (!results[2]) {
+            return '';
+        }
 
         return decodeURIComponent(results[2].replace(/\+/g, " "));
     }

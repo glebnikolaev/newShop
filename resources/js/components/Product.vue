@@ -52,17 +52,18 @@
 
                                     <div class="size-204 respon6-next">
                                         <div class="rs1-select2 bor8 bg0">
-                                            <v-select
+                                            <multiselect
                                                 v-model="selected[index]"
-                                                label="name"
                                                 :options="option.parameters"
-                                                :clearable="false"
-                                                :searchable="false"
-                                                @option:selecting="handleSelect(option.parameters, index)">
-                                                <template slot="option" slot-scope="option">
-                                                    {{ getLabelName(option) }}
-                                                </template>
-                                            </v-select>
+                                                :reduce="(val) => val"
+                                                track-by="id"
+                                                label="name"
+                                                :close-on-select="true"
+                                                :clear-on-select="false"
+                                                :preserve-search="true"
+                                            >
+                                                <template #option="{ option }">{{ getLabelName(option) }}</template>
+                                            </multiselect>
                                         </div>
                                     </div>
                                 </div>
@@ -122,123 +123,157 @@
 </template>
 
 <script>
-    import vSelect from 'vue-select'
-    import 'vue-select/dist/vue-select.css'
-    import axios from "axios";
+import axios from "axios";
+import bus from '../bus';
+import Multiselect from 'vue-multiselect'
+import 'vue-multiselect/dist/vue-multiselect.min.css'
+import { ref, reactive, onMounted, watch } from 'vue';
+import { useStore } from 'vuex';
 
-    export default {
-        name: 'product',
-        components: {vSelect},
-        data() {
-            return {
-                isVisible: false,
-                mainImage: '',
-                quantity: 1,
-                product: {
-                    id: null,
-                    images: {},
-                    image: null,
-                    name: null,
-                    price: 0,
-                    options: {},
-                },
-                selectedProduct: {
-                    productId: null,
-                    quantity: 1,
-                    options: []
-                },
-                selected: [],
-                selectedPrice: 0
+export default {
+    name: 'product',
+    components: { Multiselect },
+    setup() {
+        const store = useStore();
 
+        const isVisible = ref(false);
+        const mainImage = ref('');
+        const quantity = ref(1);
+        const product = reactive({ id: null, images: [], image: null, name: null, price: 0, options: [] });
+        const selectedProduct = ref({ productId: null, quantity: 1, options: [] });
+        const selected = ref([]);
+        const selectedPrice = ref(0);
+
+        const setSelected = () => {
+            selectedProduct.value = {
+                productId: product.id,
+                quantity: quantity.value,
+                options: selected.value
             };
-        },
-        mounted() {
-            this.$bus.$on('toggle-product-modal', () => {
-                this.product = this.$store.getters.product;
-                this.isVisible = !this.isVisible;
-                this.mainImage = this.product.image;
+        };
 
-                this.product.options.forEach( (value, index) => {
-                    this.selected.push(value.parameters[0]);
-                });
+        const setQuantity = () => {
+            selectedProduct.value.quantity = quantity.value;
+        };
 
-                this.setSelected();
+        const close = () => {
+            isVisible.value = !isVisible.value;
+            unselectProduct();
+        };
+
+        const changeMainImg = (image) => {
+            mainImage.value = image.path;
+        };
+
+        const isImgChecked = (image) => {
+            return mainImage.value === image.path;
+        };
+
+        const addToCart = () => {
+            axios.post('/api/v1/cart/add-to-cart', selectedProduct.value)
+                .then(response => {
+                    store.dispatch('updateCart', response.data);
+                }).finally(() => {
+                bus.emit('update-cart-count');
             });
-        },
-        watch: {
-            selectedProduct:function() {
-                this.calculatePrice();
-            },
-        },
-        methods: {
-            close() {
-                this.isVisible = !this.isVisible;
-                this.unselectProduct();
-            },
-            changeMainImg(image) {
-                this.mainImage = image.path;
-            },
-            isImgChecked(image) {
-                return this.mainImage === image.path;
-            },
-            addToCart() {
-                axios.post('/api/v1/cart/add-to-cart', this.selectedProduct)
-                    .then(response => {
-                        this.$store.dispatch('updateCart', response.data);
-                    }).finally(() => {
-                        this.$bus.$emit('update-cart-count');
-                });
-                this.close();
-            },
-            setSelected() {
-                this.selectedProduct = {
-                    productId: this.product.id,
-                    quantity: this.quantity,
-                    options: this.selected
-                };
-            },
-            setQuantity() {
-                this.selectedProduct.quantity = this.quantity;
-            },
-            handleSelect(parameters, index) {
-                this.selected[index] = parameters[0];
-                this.setSelected();
-            },
-            increment() {
-                this.quantity += 1;
-                this.setQuantity();
-            },
-            decrement() {
-                this.quantity -= 1;
-                this.quantity = this.quantity < 1 ? 1 : this.quantity;
-                this.setQuantity();
-            },
-            unselectProduct() {
-                this.selectedProduct = {
-                    productId: null,
-                    quantity: 1,
-                    options: []
-                };
-                this.selected = [];
-                this.quantity = 1;
-                this.selectedPrice = 0;
-            },
-            calculatePrice() {
-                let price = parseInt(this.product.price);
-                this.selectedProduct.options.forEach( (value, index) => {
-                    price += parseInt(value.variation.price);
-                });
-                this.selectedPrice = price;
-            },
-            getLabelName(option) {
-                let label;
-                if (option.variation.price < 0) {
-                    label = ' ('+ option.variation.price +'₽)';
-                } else {
-                    label = ' (+'+ option.variation.price +'₽)';
+            close();
+        };
+
+        const handleSelect = (option, index) => {
+            selected.value[index] = option;
+            setSelected();
+        };
+
+        const increment = () => {
+            quantity.value += 1;
+            setQuantity();
+        };
+
+        const decrement = () => {
+            quantity.value -= 1;
+            quantity.value = quantity.value < 1 ? 1 : quantity.value;
+            setQuantity();
+        };
+
+        const unselectProduct = () => {
+            selectedProduct.value = { productId: null, quantity: 1, options: [] };
+            selected.value = [];
+            quantity.value = 1;
+            selectedPrice.value = 0;
+        };
+
+        const calculatePrice = () => {
+            let price = parseInt(product.price) || 0;
+            selectedProduct.value.options.forEach((value) => {
+                if (value && value.variation) {
+                    price += parseInt(value.variation.price) || 0;
                 }
-                return option.name + label;
+            });
+            selectedPrice.value = price;
+        };
+
+        const getLabelName = (option) => {
+            let label;
+            if (option.variation.price < 0) {
+                label = ' ('+ option.variation.price +'₽)';
+            } else {
+                label = ' (+'+ option.variation.price +'₽)';
             }
-        },
+            return option.name + label;
+        };
+
+        onMounted(() => {
+            bus.on('toggle-product-modal', () => {
+                const p = store.getters.product;
+                // copy fields into reactive product
+                product.id = p.id;
+                product.images = p.images || [];
+                product.image = p.image;
+                product.name = p.name;
+                product.price = p.price;
+                product.options = p.options || [];
+
+                isVisible.value = !isVisible.value;
+                mainImage.value = product.image;
+
+                selected.value = [];
+                product.options.forEach((value) => {
+                    selected.value.push(value.parameters[0]);
+                });
+
+                setSelected();
+            });
+        });
+
+        watch(selectedProduct, () => {
+            calculatePrice();
+        }, { deep: true });
+
+        watch(selected, () => {
+            setSelected();
+        }, { deep: true });
+
+        return {
+            isVisible,
+            mainImage,
+            quantity,
+            product,
+            selectedProduct,
+            selected,
+            selectedPrice,
+            close,
+            changeMainImg,
+            isImgChecked,
+            addToCart,
+            setSelected,
+            setQuantity,
+            handleSelect,
+            increment,
+            decrement,
+            unselectProduct,
+            calculatePrice,
+            getLabelName,
+        };
     }
+}
 </script>

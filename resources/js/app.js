@@ -1,29 +1,26 @@
-require('./bootstrap');
-import Vue from 'vue';
+import './bootstrap';
+import { createApp } from 'vue';
+import App from './App.vue';
 import store from './store';
 import router from './router';
-import App from './App.vue';
-
-Vue.component('App', App);
+import bus from './bus';
+import utilities from './utilities';
 
 if (!localStorage.getItem('cartiny_cart')) {
     localStorage.setItem('cartiny_cart', JSON.stringify({}));
 }
 
-Object.defineProperty(Vue.prototype,"$bus",{
-    get: function() {
-        return this.$root.bus;
-    }
-});
+const app = createApp(App);
 
-new Vue({
-    store,
-    router,
-    render: h => h(App),
-    mounted() {
-        document.documentElement.classList.remove('has-spinner-active')
-    },
-    data: {
-        bus: new Vue({})
-    }
-}).$mount('#app');
+app.config.globalProperties.$bus = bus;
+app.config.globalProperties.$_ = utilities;
+
+app.use(store);
+app.use(router);
+
+app.mount('#app');
+
+// keep a small init hook similar to previous behavior
+document.documentElement.classList.remove('has-spinner-active');
+
+export default app;

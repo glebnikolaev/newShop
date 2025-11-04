@@ -1,18 +1,14 @@
 <template>
     <div id="app">
         <main-nav-bar/>
-
+        <featured/>
         <router-view/>
-
         <footer-bar/>
-
         <div class="btn-back-to-top" id="myBtn">
 		    <span class="symbol-btn-back-to-top"><i class="zmdi zmdi-chevron-up"></i></span>
         </div>
-
         <product/>
         <cart-aside/>
-
     </div>
 </template>
 
@@ -23,10 +19,13 @@
     import cartAside from "./components/CartAside";
     import product from './components/Product';
     import axios from "axios";
+    import bus from './bus';
+    import Featured from './components/Featured';
 
     export default {
         name: 'home',
         components: {
+            Featured,
             mainNavBar,
             cartAside,
             footerBar,
@@ -41,7 +40,7 @@
                     .then(response => {
                         this.$store.dispatch('updateCart', response.data);
                     }).finally(() => {
-                    this.$bus.$emit('update-cart-count');
+                    bus.emit('update-cart-count');
                 });
             },
         }

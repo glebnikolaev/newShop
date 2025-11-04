@@ -11,13 +11,16 @@ use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 class FeaturedController extends Controller
 {
     /**
-     * Выводим список избранного
+     * Выводим cписок избранного
      *
      * @return AnonymousResourceCollection
      */
     public function index(): AnonymousResourceCollection
     {
-        $products = Product::isActive()->isFeatured()->with('categories', 'options', 'options.parameters', 'images', 'options.parameters.variation')->get();
+        $products = Product::isActive()
+            ->isFeatured()
+            ->with('categories', 'options', 'options.parameters', 'images', 'options.parameters.variation')
+            ->get();
         return ProductResource::collection($products);
     }
 }
