@@ -1,3 +1,42 @@
+@use "sass:color";
+
+// Legacy color helpers rewritten with module API to silence Sass deprecation warnings.
+@function lighten($color-value, $amount) {
+    @return color.adjust($color-value, $lightness: $amount);
+}
+
+@function darken($color-value, $amount) {
+    @return color.adjust($color-value, $lightness: -$amount);
+}
+
+@function saturate($color-value, $amount) {
+    @return color.adjust($color-value, $saturation: $amount);
+}
+
+@function desaturate($color-value, $amount) {
+    @return color.adjust($color-value, $saturation: -$amount);
+}
+
+@function adjust-hue($color-value, $amount) {
+    @return color.adjust($color-value, $hue: $amount);
+}
+
+@function opacify($color-value, $amount) {
+    @return color.adjust($color-value, $alpha: $amount);
+}
+
+@function transparentize($color-value, $amount) {
+    @return color.adjust($color-value, $alpha: -$amount);
+}
+
+@function fade-in($color-value, $amount) {
+    @return color.adjust($color-value, $alpha: $amount);
+}
+
+@function fade-out($color-value, $amount) {
+    @return color.adjust($color-value, $alpha: -$amount);
+}
+
 // Fonts
 //@import url('https://fonts.googleapis.com/css?family=Nunito');
 
