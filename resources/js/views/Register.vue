@@ -15,7 +15,7 @@
                                 <div class="form-group row">
                                     <label for="name" class="col-sm-4 col-form-label text-md-right">Имя</label>
                                     <div class="col-md-6">
-                                        <input id="name" type="email" class="form-control" v-model="name" required
+                                      <input id="name" type="text" class="form-control" v-model="name" required
                                                autofocus autocomplete="off">
                                     </div>
                                 </div>
@@ -53,46 +53,50 @@
 </template>
 
 <script>
-import axios from 'axios';
+import { register } from '../services/authService';
+
 export default {
     data() {
         return {
-            name: "",
-            email: "",
-            password: "",
-            error: null
-        }
+            name: '',
+            email: '',
+            password: '',
+            error: null,
+        };
     },
     methods: {
-        handleSubmit(e) {
-            e.preventDefault()
-            if (this.password.length > 0) {
-                axios.get('/sanctum/csrf-cookie').then(response => {
-                    axios.post('api/v1/register', {
-                        name: this.name,
-                        email: this.email,
-                        password: this.password
-                    })
-                    .then(response => {
-                        if (response.data.success) {
-                            this.$router.go('/')
-                        } else {
-                            this.error = response.data.message
-                        }
-                    })
-                    .catch(function (error) {
-                        console.error(error.response.data);
-                        this.error = error.response.data.message
-                    });
-                })
+        async handleSubmit(event) {
+            event.preventDefault();
+            if (!this.password.length) {
+                return;
             }
-        }
+
+            try {
+                const response = await register({
+                    name: this.name,
+                    email: this.email,
+                    password: this.password,
+                });
+
+                if (response?.success) {
+                    this.error = null;
+                    this.$router.push('/');
+                } else {
+                    this.error = response?.message || 'Не удалось завершить регистрацию';
+                }
+            } catch (error) {
+                if (process.env.NODE_ENV !== 'production') {
+                    console.error(error);
+                }
+                this.error = error?.response?.data?.message || 'Ошибка при регистрации';
+            }
+        },
     },
     beforeRouteEnter(to, from, next) {
-        if (window.Laravel.isLoggedin) {
+        if (typeof window !== 'undefined' && window.Laravel && window.Laravel.isLoggedin) {
             return next('/');
         }
         next();
-    }
-}
+    },
+};
 </script>

@@ -2,7 +2,11 @@
     <div class="sec-banner bg0 p-t-80 p-b-50">
         <div class="container">
             <div class="row">
-                <div v-for="banner in banners" class="col-md-6 col-xl-3 p-b-30 m-lr-auto">
+                  <div
+                      v-for="banner in banners"
+                      :key="banner.id || banner.title"
+                      class="col-md-6 col-xl-3 p-b-30 m-lr-auto"
+                  >
                     <div class="block1 wrap-pic-w">
                         <img :src="banner.image" :alt="banner.title">
 
@@ -24,26 +28,32 @@
 </template>
 
 <script>
-import axios from 'axios';
 import { ref, onMounted } from 'vue';
+import { fetchBanners } from '../services/catalogService';
 
 export default {
     name: 'banners',
     setup() {
         const banners = ref([]);
 
+        const loadBanners = async () => {
+            try {
+                banners.value = await fetchBanners();
+            } catch (error) {
+                banners.value = [];
+                if (process.env.NODE_ENV !== 'production') {
+                    console.error('Не удалось загрузить баннеры', error);
+                }
+            }
+        };
+
         onMounted(() => {
-            axios.get('/api/v1/banners')
-                .then(response => {
-                    banners.value = response.data.data;
-                }).catch(() => {
-                    banners.value = [];
-                });
+            loadBanners();
         });
 
         return {
             banners,
         };
-    }
-}
+    },
+};
 </script>

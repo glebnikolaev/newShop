@@ -45,44 +45,48 @@
 </template>
 
 <script>
-import axios from 'axios';
+import { login } from '../services/authService';
+
 export default {
     data() {
         return {
-            email: "",
-            password: "",
-            error: null
-        }
+            email: '',
+            password: '',
+            error: null,
+        };
     },
     methods: {
-        handleSubmit(e) {
-            e.preventDefault()
-            if (this.password.length > 0) {
-                axios.get('/sanctum/csrf-cookie').then(response => {
-                    axios.post('api/v1/login', {
-                        email: this.email,
-                        password: this.password
-                    })
-                    .then(response => {
-                        console.log(response.data)
-                        if (response.data.success) {
-                            this.$router.go('/')
-                        } else {
-                            this.error = response.data.message
-                        }
-                    })
-                    .catch(function (error) {
-                        console.error(error);
-                    });
-                })
+        async handleSubmit(event) {
+            event.preventDefault();
+            if (!this.password.length) {
+                return;
             }
-        }
+
+            try {
+                const response = await login({
+                    email: this.email,
+                    password: this.password,
+                });
+
+                if (response?.success) {
+                    this.error = null;
+                    this.$router.push('/');
+                } else {
+                    this.error = response?.message || 'Не удалось выполнить вход';
+                }
+            } catch (error) {
+                if (process.env.NODE_ENV !== 'production') {
+                    console.error(error);
+                }
+                this.error = error?.response?.data?.message || 'Ошибка при выполнении входа';
+            }
+        },
     },
     beforeRouteEnter(to, from, next) {
-        if (window.Laravel.isLoggedin) {
+        if (typeof window !== 'undefined' && window.Laravel && window.Laravel.isLoggedin) {
             return next('/');
         }
         next();
-    }
-}
+    },
+};
 </script>

@@ -8,10 +8,10 @@
                     <div class="left-top-bar">АКЦИЯ: при регистрации 100 приветственных баллов в подарок</div>
 
                     <div class="right-top-bar flex-w h-full">
-                        <a href="#" class="flex-c-m trans-04 p-lr-25">Написать Директору</a>
-                        <a href="#" class="flex-c-m trans-04 p-lr-25">Личный кабинет</a>
-                        <template v-if="isLoggedIn">
-                            <a v-if="isLoggedIn" class="nav-item nav-link"  @click="logout">Выйти</a>
+                          <a href="#" class="flex-c-m trans-04 p-lr-25">Написать Директору</a>
+                          <a href="#" class="flex-c-m trans-04 p-lr-25">Личный кабинет</a>
+                          <template v-if="isLoggedIn">
+                              <a v-if="isLoggedIn" class="nav-item nav-link"  @click="handleLogout">Выйти</a>
                         </template>
                         <template v-else>
                             <router-link to="/login" class="nav-item nav-link">Войти</router-link>
@@ -29,11 +29,20 @@
                         <img src="images/icons/logo-01.png" alt="IMG-LOGO">
                     </a>
                     <div class="menu-desktop">
-                        <ul class="main-menu">
-                            <li class="active-menu-removeit" v-for="links in topNavBarLinks">
-                                <a :href="links.href">{{ links.label }}</a>
-                                <ul class="sub-menu" v-if="links.child.length > 0">
-                                    <li v-for="child in links.child"><a :href="child.href">{{ child.label }}</a></li>
+                          <ul class="main-menu">
+                              <li
+                                  class="active-menu-removeit"
+                                  v-for="links in topNavBarLinks"
+                                  :key="links.sort ?? links.label"
+                              >
+                                  <a :href="links.href">{{ links.label }}</a>
+                                  <ul class="sub-menu" v-if="links.child.length > 0">
+                                      <li
+                                          v-for="child in links.child"
+                                          :key="child.sort ?? child.label"
+                                      >
+                                          <a :href="child.href">{{ child.label }}</a>
+                                      </li>
                                 </ul>
                             </li>
                         </ul>
@@ -153,8 +162,8 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
-import axios from 'axios';
 import bus from '../bus';
+import { logout as requestLogout } from '../services/authService';
 
 export default {
     name: 'mainNavBar',
@@ -164,8 +173,9 @@ export default {
 
         const isFixed = ref(false);
         const windowScrollY = ref(40);
-        const cartCount = ref(0);
-        const isLoggedIn = ref(false);
+        const cart = computed(() => store.getters.cart || { count: 0 });
+        const cartCount = computed(() => cart.value.count || 0);
+        const isLoggedIn = ref(Boolean(typeof window !== 'undefined' && window.Laravel && window.Laravel.isLoggedin));
 
         const handleScroll = () => {
             isFixed.value = window.scrollY >= 40;
@@ -176,46 +186,34 @@ export default {
             bus.emit('toggle-cart-modal');
         };
 
-        const logout = (e) => {
-            e.preventDefault();
-            axios.get('/sanctum/csrf-cookie').then(() => {
-                axios.post('/api/v1/logout')
-                    .then(response => {
-                        if (response.data.success) {
-                            // navigate to home
-                            router.push('/');
-                        } else {
-                            console.log(response);
-                        }
-                    })
-                    .catch(function (error) {
-                        console.error(error);
-                    });
-            });
+        const handleLogout = async (event) => {
+            event.preventDefault();
+            try {
+                const response = await requestLogout();
+                if (response?.success) {
+                    isLoggedIn.value = false;
+                    if (typeof window !== 'undefined' && window.Laravel) {
+                        window.Laravel.isLoggedin = false;
+                    }
+                    router.push('/');
+                } else if (process.env.NODE_ENV !== 'production') {
+                    console.error('Ошибка при выходе', response);
+                }
+            } catch (error) {
+                if (process.env.NODE_ENV !== 'production') {
+                    console.error('Ошибка при выходе', error);
+                }
+            }
         };
 
-        const topNavBarLinks = computed(() => store.getters.topNavBarLinks);
+        const topNavBarLinks = computed(() => store.getters.topNavBarLinks || []);
 
         onMounted(() => {
             window.addEventListener('scroll', handleScroll);
-            if (window.Laravel && window.Laravel.isLoggedin) {
-                isLoggedIn.value = true;
-            }
-
-            // initialize cart count
-            cartCount.value = store.getters.cart ? store.getters.cart.count : 0;
-
-            bus.on('update-cart-count', () => {
-                cartCount.value = store.getters.cart.count;
-            });
         });
 
         onUnmounted(() => {
             window.removeEventListener('scroll', handleScroll);
-            // try to remove bus listener if bus supports off
-            if (bus && typeof bus.off === 'function') {
-                bus.off('update-cart-count');
-            }
         });
 
         return {
@@ -226,10 +224,10 @@ export default {
             topNavBarLinks,
             handleScroll,
             openCartModal,
-            logout,
+            handleLogout,
         };
     }
-}
+};
 </script>
 
 
