@@ -1,6 +1,6 @@
 {
     "/js/app.js": "/js/app.js",
-    "/css/main.css": "/css/main.css",
+    "/css/app.css": "/css/app.css",
     "/fonts/Poppins-Light.ttf?be86c23ccc9cb2e1f4f1762a4fcea066": "/fonts/Poppins-Light.ttf?be86c23ccc9cb2e1f4f1762a4fcea066",
     "/fonts/Poppins-ExtraLight.ttf?e0956b3d1b7f8036e8e213f6b31bc03b": "/fonts/Poppins-ExtraLight.ttf?e0956b3d1b7f8036e8e213f6b31bc03b",
     "/fonts/Poppins-Medium.ttf?b59f6a636397975c540983a35a5b22f7": "/fonts/Poppins-Medium.ttf?b59f6a636397975c540983a35a5b22f7",
@@ -14,6 +14,6 @@
     "/images/icon-next.png?f2c41fc445006bf65f50a9ee2a952840": "/images/icon-next.png?f2c41fc445006bf65f50a9ee2a952840",
     "/images/icon-prev.png?91df0250d15475c8602c9e79fa0dd9f0": "/images/icon-prev.png?91df0250d15475c8602c9e79fa0dd9f0",
     "/images/icon-close.png?4514e3c6e1bf5bc78acadbb6a8350bf4": "/images/icon-close.png?4514e3c6e1bf5bc78acadbb6a8350bf4",
-    "/css/util.css": "/css/util.css",
-    "/css/app.css": "/css/app.css"
+    "/css/main.css": "/css/main.css",
+    "/css/util.css": "/css/util.css"
 }

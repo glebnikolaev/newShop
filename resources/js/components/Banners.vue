@@ -1,5 +1,5 @@
 <template>
-    <div class="sec-banner bg0 p-t-80 p-b-50">
+    <div class="sec-banner bg0 p-t-80 p-b-10">
         <div class="container">
             <div class="row">
                   <div

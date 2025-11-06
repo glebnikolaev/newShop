@@ -1,7 +1,6 @@
 <template>
     <div id="app">
         <main-nav-bar/>
-        <featured/>
         <router-view/>
         <footer-bar/>
         <div class="btn-back-to-top" id="myBtn">
