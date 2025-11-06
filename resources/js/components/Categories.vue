@@ -292,46 +292,44 @@
 </template>
 
 <script>
-import axios from 'axios';
 import bus from '../bus';
 import { ref, onMounted, computed } from 'vue';
 import { useStore } from 'vuex';
+import { fetchCategories } from '../services/catalogService';
 
 export default {
     name: 'categories',
     setup() {
         const store = useStore();
         const categories = ref([]);
-        const products = ref([]);
-        const fkey = ref('slug');
         const filter = ref('All');
 
+        const loadCategories = async () => {
+            try {
+                categories.value = await fetchCategories();
+            } catch (error) {
+                categories.value = [];
+                if (process.env.NODE_ENV !== 'production') {
+                    console.error('Не удалось загрузить категории', error);
+                }
+            }
+        };
+
         onMounted(() => {
-            axios.get('/api/v1/categories')
-                .then(response => {
-                    // support both response.data.data and response.data (in case API returns array directly)
-                    const payload = response && response.data ? (response.data.data ?? response.data) : [];
-                    categories.value = Array.isArray(payload) ? payload : [];
-                }).catch(() => {
-                    categories.value = [];
-                });
+            loadCategories();
         });
 
         const filteredCategories = computed(() => {
-            if (!Array.isArray(categories.value)) return [];
-            if (filter.value === 'All') return categories.value;
-            return categories.value.filter(c => c && c.slug === filter.value);
-        });
-
-        const resultsFilter = (entry) => {
-            if (filter.value !== 'All') {
-                if (entry === filter.value) {
-                    return entry;
-                }
-            } else {
-                return entry;
+            if (!Array.isArray(categories.value)) {
+                return [];
             }
-        };
+
+            if (filter.value === 'All') {
+                return categories.value;
+            }
+
+            return categories.value.filter((category) => category && category.slug === filter.value);
+        });
 
         const openProductModal = (product) => {
             store.dispatch('setProduct', product);
@@ -340,14 +338,11 @@ export default {
 
         return {
             categories,
-            products,
-            fkey,
             filter,
             filteredCategories,
-            resultsFilter,
             openProductModal,
         };
-    }
-}
+    },
+};
 </script>
 

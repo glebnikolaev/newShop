@@ -13,10 +13,12 @@
                         <div class="p-l-25 p-r-30 p-lr-0-lg">
                             <div class="wrap-slick3 flex-sb flex-w">
                                 <div class="wrap-slick3-dots">
-                                    <ul class="slick3-dots" v-if="product.images.length > 0">
-                                        <li v-for="image in product.images"
-                                            @click="changeMainImg(image)"
-                                            :class="{ 'slick-active': isImgChecked(image) }">
+                                      <ul class="slick3-dots" v-if="product.images.length > 0">
+                                          <li
+                                              v-for="image in product.images"
+                                              :key="image.id || image.path"
+                                              @click="changeMainImg(image)"
+                                              :class="{ 'slick-active': isImgChecked(image) }">
                                             <img
                                                 :src="image.path"
                                                 :alt="product.name"
@@ -44,9 +46,12 @@
                             <span class="mtext-106 cl2">{{ selectedPrice }} ₽</span>
                             <p class="stext-102 cl3 p-t-23">{{ product.description }}</p>
                             <div class="p-t-33">
-                                <div class="flex-w flex-r-m p-b-10"
-                                     v-if="product && product.options.length > 0"
-                                     v-for="(option, index) in product.options" >
+                                  <div
+                                      class="flex-w flex-r-m p-b-10"
+                                      v-if="product && product.options.length > 0"
+                                      v-for="(option, index) in product.options"
+                                      :key="option.id || index"
+                                  >
 
                                     <div class="size-203 flex-c-m respon6">{{ option.name }}</div>
 
@@ -123,12 +128,12 @@
 </template>
 
 <script>
-import axios from "axios";
 import bus from '../bus';
-import Multiselect from 'vue-multiselect'
-import 'vue-multiselect/dist/vue-multiselect.min.css'
-import { ref, reactive, onMounted, watch } from 'vue';
+import Multiselect from 'vue-multiselect';
+import 'vue-multiselect/dist/vue-multiselect.min.css';
+import { ref, reactive, onMounted, onUnmounted, watch } from 'vue';
 import { useStore } from 'vuex';
+import { addToCart as addItemToCart } from '../services/cartService';
 
 export default {
     name: 'product',
@@ -148,7 +153,7 @@ export default {
             selectedProduct.value = {
                 productId: product.id,
                 quantity: quantity.value,
-                options: selected.value
+                options: [...selected.value],
             };
         };
 
@@ -157,7 +162,7 @@ export default {
         };
 
         const close = () => {
-            isVisible.value = !isVisible.value;
+            isVisible.value = false;
             unselectProduct();
         };
 
@@ -165,18 +170,18 @@ export default {
             mainImage.value = image.path;
         };
 
-        const isImgChecked = (image) => {
-            return mainImage.value === image.path;
-        };
+        const isImgChecked = (image) => mainImage.value === image.path;
 
-        const addToCart = () => {
-            axios.post('/api/v1/cart/add-to-cart', selectedProduct.value)
-                .then(response => {
-                    store.dispatch('updateCart', response.data);
-                }).finally(() => {
-                bus.emit('update-cart-count');
-            });
-            close();
+        const addToCart = async () => {
+            try {
+                const cart = await addItemToCart(selectedProduct.value);
+                store.dispatch('updateCart', cart);
+                close();
+            } catch (error) {
+                if (process.env.NODE_ENV !== 'production') {
+                    console.error('Ошибка добавления в корзину', error);
+                }
+            }
         };
 
         const handleSelect = (option, index) => {
@@ -190,8 +195,7 @@ export default {
         };
 
         const decrement = () => {
-            quantity.value -= 1;
-            quantity.value = quantity.value < 1 ? 1 : quantity.value;
+            quantity.value = Math.max(1, quantity.value - 1);
             setQuantity();
         };
 
@@ -203,55 +207,66 @@ export default {
         };
 
         const calculatePrice = () => {
-            let price = parseInt(product.price) || 0;
+            let price = parseInt(product.price, 10) || 0;
+
             selectedProduct.value.options.forEach((value) => {
-                if (value && value.variation) {
-                    price += parseInt(value.variation.price) || 0;
+                if (value?.variation) {
+                    price += parseInt(value.variation.price, 10) || 0;
                 }
             });
+
             selectedPrice.value = price;
         };
 
         const getLabelName = (option) => {
-            let label;
-            if (option.variation.price < 0) {
-                label = ' ('+ option.variation.price +'₽)';
-            } else {
-                label = ' (+'+ option.variation.price +'₽)';
+            const name = option?.name || '';
+            const delta = parseInt(option?.variation?.price, 10) || 0;
+
+            if (delta === 0) {
+                return name;
             }
-            return option.name + label;
+
+            const sign = delta > 0 ? '+' : '';
+            return `${name} (${sign}${delta}₽)`;
+        };
+
+        const openProductModal = () => {
+            const p = store.getters.product || {};
+            product.id = p.id ?? null;
+            product.images = Array.isArray(p.images) ? p.images : [];
+            product.image = p.image ?? '';
+            product.name = p.name ?? '';
+            product.price = p.price ?? 0;
+            product.options = Array.isArray(p.options) ? p.options : [];
+
+            isVisible.value = true;
+            mainImage.value = product.image || product.images?.[0]?.path || '';
+
+            selected.value = product.options.map((value) => (Array.isArray(value?.parameters) ? value.parameters[0] : null));
+
+            setSelected();
+            calculatePrice();
         };
 
         onMounted(() => {
-            bus.on('toggle-product-modal', () => {
-                const p = store.getters.product;
-                // copy fields into reactive product
-                product.id = p.id;
-                product.images = p.images || [];
-                product.image = p.image;
-                product.name = p.name;
-                product.price = p.price;
-                product.options = p.options || [];
-
-                isVisible.value = !isVisible.value;
-                mainImage.value = product.image;
-
-                selected.value = [];
-                product.options.forEach((value) => {
-                    selected.value.push(value.parameters[0]);
-                });
-
-                setSelected();
-            });
+            bus.on('toggle-product-modal', openProductModal);
         });
 
-        watch(selectedProduct, () => {
-            calculatePrice();
-        }, { deep: true });
+        onUnmounted(() => {
+            bus.off('toggle-product-modal', openProductModal);
+        });
 
-        watch(selected, () => {
-            setSelected();
-        }, { deep: true });
+        watch(selectedProduct, calculatePrice, { deep: true });
+        watch(selected, setSelected, { deep: true });
+        watch(quantity, (value) => {
+            const parsed = parseInt(value, 10);
+            if (Number.isNaN(parsed) || parsed < 1) {
+                quantity.value = 1;
+            } else if (parsed !== value) {
+                quantity.value = parsed;
+            }
+            setQuantity();
+        });
 
         return {
             isVisible,
@@ -265,15 +280,11 @@ export default {
             changeMainImg,
             isImgChecked,
             addToCart,
-            setSelected,
-            setQuantity,
             handleSelect,
             increment,
             decrement,
-            unselectProduct,
-            calculatePrice,
             getLabelName,
         };
-    }
-}
+    },
+};
 </script>

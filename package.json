@@ -26,7 +26,6 @@
     },
     "dependencies": {
         "mitt": "^3.0.1",
-        "moment": "^2.26.0",
         "vue-multiselect": "^3.4.0",
         "vue-router": "^4.0.0",
         "vuex": "^4.0.0"

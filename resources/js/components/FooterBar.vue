@@ -136,35 +136,27 @@
                     </a>
                 </div>
 
-                <p class="stext-107 cl6 txt-center">
-                    <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
-                    Copyright &copy; Gleb All rights reserved | This template is made with <i class="fa fa-heart-o"
-                                                                        aria-hidden="true"></i> by <a
-                    href="#" target="_blank">Cartiny</a>
-                    <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
-
-                </p>
+                  <p class="stext-107 cl6 txt-center">
+                      Copyright &copy; {{ year }} Gleb. All rights reserved | This template is made with
+                      <i class="fa fa-heart-o" aria-hidden="true"></i> by
+                      <a href="#" target="_blank">Cartiny</a>
+                  </p>
             </div>
         </div>
     </footer>
 </template>
 
 <script>
-import moment from 'moment'
-import { computed } from 'vue'
-import { useStore } from 'vuex'
+import { computed } from 'vue';
 
 export default {
     name: 'footerBar',
     setup() {
-        const store = useStore();
-        const year = computed(() => moment().year());
-        const isFooterBarVisible = computed(() => store.state.isFooterBarVisible);
+        const year = computed(() => new Date().getFullYear());
 
         return {
             year,
-            isFooterBarVisible,
-        }
-    }
-}
+        };
+    },
+};
 </script>

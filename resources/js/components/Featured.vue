@@ -5,7 +5,11 @@
                 <h3 class="ltext-103 cl5">Рекомендуем</h3>
             </div>
             <div class="row isotope-grid">
-                <div v-for="product in featuredProducts" class="col-sm-6 col-md-4 col-lg-3 p-b-35 isotope-item">
+                  <div
+                      v-for="product in featuredProducts"
+                      :key="product.id || product.slug || product.name"
+                      class="col-sm-6 col-md-4 col-lg-3 p-b-35 isotope-item"
+                  >
                     <div class="block2">
                         <div class="block2-pic hov-img0">
                             <img
@@ -46,10 +50,10 @@
 </template>
 
 <script>
-import axios from 'axios';
 import bus from '../bus';
 import { ref, onMounted } from 'vue';
 import { useStore } from 'vuex';
+import { fetchFeatured } from '../services/catalogService';
 
 export default {
     name: 'featured',
@@ -57,13 +61,19 @@ export default {
         const store = useStore();
         const featuredProducts = ref([]);
 
+        const loadFeaturedProducts = async () => {
+            try {
+                featuredProducts.value = await fetchFeatured();
+            } catch (error) {
+                featuredProducts.value = [];
+                if (process.env.NODE_ENV !== 'production') {
+                    console.error('Не удалось загрузить рекомендуемые товары', error);
+                }
+            }
+        };
+
         onMounted(() => {
-            axios.get('/api/v1/modules/featured')
-                .then(response => {
-                    featuredProducts.value = response.data.data;
-                }).catch(() => {
-                    featuredProducts.value = [];
-                });
+            loadFeaturedProducts();
         });
 
         const openProductModal = (product) => {
@@ -75,6 +85,6 @@ export default {
             featuredProducts,
             openProductModal,
         };
-    }
-}
+    },
+};
 </script>

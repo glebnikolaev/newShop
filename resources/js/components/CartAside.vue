@@ -12,9 +12,13 @@
             </div>
 
             <div class="header-cart-content flex-w js-pscroll">
-                <ul class="header-cart-wrapitem w-full" v-if="cart.count > 0">
+                  <ul class="header-cart-wrapitem w-full" v-if="cart.count > 0">
 
-                    <li class="header-cart-item flex-w flex-t m-b-12" v-for="product in cart.data">
+                      <li
+                          class="header-cart-item flex-w flex-t m-b-12"
+                          v-for="product in cart.data"
+                          :key="product.id || product.name"
+                      >
                         <div class="header-cart-item-img" @click.prevent='openProductModal(product)'>
                             <img
                                  :src="product.image ? product.image : '/photos/1/no-photo.jpg'"
@@ -57,7 +61,7 @@
 </template>
 
 <script>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, onUnmounted, computed } from 'vue';
 import { useStore } from 'vuex';
 import bus from '../bus';
 
@@ -67,20 +71,33 @@ export default {
         const store = useStore();
 
         const isVisible = ref(false);
-        const selected = ref(null);
-        const cart = ref({ data: {}, count: 0, subTotal: 0, total: 0 });
-        const shipping = ref([]);
-        const payment = ref([]);
+        const cart = computed(() => {
+            const cartState = store.getters.cart || {};
+            const rawItems = cartState.data || [];
+            const items = Array.isArray(rawItems) ? rawItems : Object.values(rawItems);
+
+            return {
+                data: items,
+                count: cartState.count || 0,
+                subTotal: cartState.subTotal || 0,
+                total: cartState.total || 0,
+            };
+        });
+
+        const toggleCartModal = () => {
+            isVisible.value = !isVisible.value;
+        };
 
         onMounted(() => {
-            bus.on('toggle-cart-modal', () => {
-                isVisible.value = !isVisible.value;
-                cart.value = store.getters.cart;
-            });
+            bus.on('toggle-cart-modal', toggleCartModal);
+        });
+
+        onUnmounted(() => {
+            bus.off('toggle-cart-modal', toggleCartModal);
         });
 
         const close = () => {
-            isVisible.value = !isVisible.value;
+            isVisible.value = false;
         };
 
         const openProductModal = (product) => {
@@ -90,13 +107,10 @@ export default {
 
         return {
             isVisible,
-            selected,
             cart,
-            shipping,
-            payment,
             close,
             openProductModal,
         };
-    }
-}
+    },
+};
 </script>

@@ -18,8 +18,7 @@
     import footerBar from "./components/FooterBar";
     import cartAside from "./components/CartAside";
     import product from './components/Product';
-    import axios from "axios";
-    import bus from './bus';
+    import { fetchCart } from './services/cartService';
     import Featured from './components/Featured';
 
     export default {
@@ -35,13 +34,15 @@
             this.getCart();
         },
         methods: {
-            getCart() {
-                axios.get('/api/v1/cart/get-cart')
-                    .then(response => {
-                        this.$store.dispatch('updateCart', response.data);
-                    }).finally(() => {
-                    bus.emit('update-cart-count');
-                });
+            async getCart() {
+                try {
+                    const cart = await fetchCart();
+                    this.$store.dispatch('updateCart', cart);
+                } catch (error) {
+                    if (process.env.NODE_ENV !== 'production') {
+                        console.error('Не удалось загрузить корзину', error);
+                    }
+                }
             },
         }
     }
