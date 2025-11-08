@@ -12,28 +12,25 @@
             </div>
 
             <div class="header-cart-content flex-w js-pscroll">
-                  <ul class="header-cart-wrapitem w-full" v-if="cart.count > 0">
+                <ul class="header-cart-wrapitem w-full" v-if="cart.count > 0">
 
-                      <li
-                          class="header-cart-item flex-w flex-t m-b-12"
-                          v-for="product in cart.data"
-                          :key="product.id || product.name"
-                      >
+                    <li v-for="product in cart.data"  class="header-cart-item flex-w flex-t m-b-12"
+                        :key="product.id || product.name"
+                    >
                         <div class="header-cart-item-img" @click.prevent='openProductModal(product)'>
                             <img
-                                 :src="product.image ? product.image : '/photos/1/no-photo.jpg'"
-                                 :alt="product.name"
-
+                                :src="product.image ? product.image : '/photos/1/no-photo.jpg'"
+                                :alt="product.name"
                             />
-
                         </div>
 
                         <div class="header-cart-item-txt">
-                            <a @click.prevent='openProductModal(product)' class="header-cart-item-name hov-cl1 trans-04">{{ product.name }}</a>
-
+                            <a @click.prevent='openProductModal(product)' class="header-cart-item-name hov-cl1 trans-04">
+                                {{ product.name }}
+                            </a>
                             <span class="header-cart-item-info">
-						{{ product.quantity }} x {{ product.price }}
-					</span>
+                                {{ product.quantity }} x {{ product.price }}
+                            </span>
                         </div>
                     </li>
                 </ul>
@@ -69,13 +66,11 @@ export default {
     name: 'cartAside',
     setup() {
         const store = useStore();
-
         const isVisible = ref(false);
         const cart = computed(() => {
             const cartState = store.getters.cart || {};
             const rawItems = cartState.data || [];
             const items = Array.isArray(rawItems) ? rawItems : Object.values(rawItems);
-
             return {
                 data: items,
                 count: cartState.count || 0,
@@ -83,28 +78,22 @@ export default {
                 total: cartState.total || 0,
             };
         });
-
         const toggleCartModal = () => {
             isVisible.value = !isVisible.value;
         };
-
         onMounted(() => {
             bus.on('toggle-cart-modal', toggleCartModal);
         });
-
         onUnmounted(() => {
             bus.off('toggle-cart-modal', toggleCartModal);
         });
-
         const close = () => {
             isVisible.value = false;
         };
-
         const openProductModal = (product) => {
             store.dispatch('setProduct', product);
             bus.emit('toggle-product-modal');
         };
-
         return {
             isVisible,
             cart,

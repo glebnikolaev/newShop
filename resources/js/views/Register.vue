@@ -15,7 +15,7 @@
                                 <div class="form-group row">
                                     <label for="name" class="col-sm-4 col-form-label text-md-right">Имя</label>
                                     <div class="col-md-6">
-                                      <input id="name" type="text" class="form-control" v-model="name" required
+                                        <input id="name" type="text" class="form-control" v-model="name" required
                                                autofocus autocomplete="off">
                                     </div>
                                 </div>
@@ -70,14 +70,12 @@ export default {
             if (!this.password.length) {
                 return;
             }
-
             try {
                 const response = await register({
                     name: this.name,
                     email: this.email,
                     password: this.password,
                 });
-
                 if (response?.success) {
                     this.error = null;
                     this.$router.push('/');

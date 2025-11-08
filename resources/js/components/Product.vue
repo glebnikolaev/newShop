@@ -13,12 +13,11 @@
                         <div class="p-l-25 p-r-30 p-lr-0-lg">
                             <div class="wrap-slick3 flex-sb flex-w">
                                 <div class="wrap-slick3-dots">
-                                      <ul class="slick3-dots" v-if="product.images.length > 0">
-                                          <li
-                                              v-for="image in product.images"
-                                              :key="image.id || image.path"
-                                              @click="changeMainImg(image)"
-                                              :class="{ 'slick-active': isImgChecked(image) }">
+                                    <ul class="slick3-dots" v-if="product.images.length > 0">
+                                        <li v-for="image in product.images"
+                                            :key="image.id || image.path"
+                                            @click="changeMainImg(image)"
+                                            :class="{ 'slick-active': isImgChecked(image) }">
                                             <img
                                                 :src="image.path"
                                                 :alt="product.name"
@@ -46,12 +45,11 @@
                             <span class="mtext-106 cl2">{{ selectedPrice }} ₽</span>
                             <p class="stext-102 cl3 p-t-23">{{ product.description }}</p>
                             <div class="p-t-33">
-                                  <div
-                                      class="flex-w flex-r-m p-b-10"
-                                      v-if="product && product.options.length > 0"
-                                      v-for="(option, index) in product.options"
-                                      :key="option.id || index"
-                                  >
+                                <div v-if="product && product.options.length > 0"
+                                    v-for="(option, index) in product.options"
+                                    :key="option.id || index"
+                                     class="flex-w flex-r-m p-b-10"
+                                >
 
                                     <div class="size-203 flex-c-m respon6">{{ option.name }}</div>
 
@@ -140,7 +138,6 @@ export default {
     components: { Multiselect },
     setup() {
         const store = useStore();
-
         const isVisible = ref(false);
         const mainImage = ref('');
         const quantity = ref(1);
@@ -148,7 +145,6 @@ export default {
         const selectedProduct = ref({ productId: null, quantity: 1, options: [] });
         const selected = ref([]);
         const selectedPrice = ref(0);
-
         const setSelected = () => {
             selectedProduct.value = {
                 productId: product.id,
@@ -156,22 +152,17 @@ export default {
                 options: [...selected.value],
             };
         };
-
         const setQuantity = () => {
             selectedProduct.value.quantity = quantity.value;
         };
-
         const close = () => {
             isVisible.value = false;
             unselectProduct();
         };
-
         const changeMainImg = (image) => {
             mainImage.value = image.path;
         };
-
         const isImgChecked = (image) => mainImage.value === image.path;
-
         const addToCart = async () => {
             try {
                 const cart = await addItemToCart(selectedProduct.value);
@@ -183,53 +174,42 @@ export default {
                 }
             }
         };
-
         const handleSelect = (option, index) => {
             selected.value[index] = option;
             setSelected();
         };
-
         const increment = () => {
             quantity.value += 1;
             setQuantity();
         };
-
         const decrement = () => {
             quantity.value = Math.max(1, quantity.value - 1);
             setQuantity();
         };
-
         const unselectProduct = () => {
             selectedProduct.value = { productId: null, quantity: 1, options: [] };
             selected.value = [];
             quantity.value = 1;
             selectedPrice.value = 0;
         };
-
         const calculatePrice = () => {
             let price = parseInt(product.price, 10) || 0;
-
             selectedProduct.value.options.forEach((value) => {
                 if (value?.variation) {
                     price += parseInt(value.variation.price, 10) || 0;
                 }
             });
-
             selectedPrice.value = price;
         };
-
         const getLabelName = (option) => {
             const name = option?.name || '';
             const delta = parseInt(option?.variation?.price, 10) || 0;
-
             if (delta === 0) {
                 return name;
             }
-
             const sign = delta > 0 ? '+' : '';
             return `${name} (${sign}${delta}₽)`;
         };
-
         const openProductModal = () => {
             const p = store.getters.product || {};
             product.id = p.id ?? null;
@@ -238,24 +218,18 @@ export default {
             product.name = p.name ?? '';
             product.price = p.price ?? 0;
             product.options = Array.isArray(p.options) ? p.options : [];
-
             isVisible.value = true;
             mainImage.value = product.image || product.images?.[0]?.path || '';
-
             selected.value = product.options.map((value) => (Array.isArray(value?.parameters) ? value.parameters[0] : null));
-
             setSelected();
             calculatePrice();
         };
-
         onMounted(() => {
             bus.on('toggle-product-modal', openProductModal);
         });
-
         onUnmounted(() => {
             bus.off('toggle-product-modal', openProductModal);
         });
-
         watch(selectedProduct, calculatePrice, { deep: true });
         watch(selected, setSelected, { deep: true });
         watch(quantity, (value) => {
@@ -267,7 +241,6 @@ export default {
             }
             setQuantity();
         });
-
         return {
             isVisible,
             mainImage,

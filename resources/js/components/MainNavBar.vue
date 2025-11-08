@@ -8,10 +8,10 @@
                     <div class="left-top-bar">АКЦИЯ: при регистрации 100 приветственных баллов в подарок</div>
 
                     <div class="right-top-bar flex-w h-full">
-                          <a href="#" class="flex-c-m trans-04 p-lr-25">Написать Директору</a>
-                          <a href="#" class="flex-c-m trans-04 p-lr-25">Личный кабинет</a>
-                          <template v-if="isLoggedIn">
-                              <a v-if="isLoggedIn" class="nav-item nav-link"  @click="handleLogout">Выйти</a>
+                        <a href="#" class="flex-c-m trans-04 p-lr-25">Написать Директору</a>
+                        <a href="#" class="flex-c-m trans-04 p-lr-25">Личный кабинет</a>
+                        <template v-if="isLoggedIn">
+                            <a v-if="isLoggedIn" class="nav-item nav-link" @click="handleLogout">Выйти</a>
                         </template>
                         <template v-else>
                             <router-link to="/login" class="nav-item nav-link">Войти</router-link>
@@ -29,20 +29,20 @@
                         <img src="images/icons/logo-01.png" alt="IMG-LOGO">
                     </a>
                     <div class="menu-desktop">
-                          <ul class="main-menu">
-                              <li
-                                  class="active-menu-removeit"
-                                  v-for="links in topNavBarLinks"
-                                  :key="links.sort ?? links.label"
-                              >
-                                  <a :href="links.href">{{ links.label }}</a>
-                                  <ul class="sub-menu" v-if="links.child.length > 0">
-                                      <li
-                                          v-for="child in links.child"
-                                          :key="child.sort ?? child.label"
-                                      >
-                                          <a :href="child.href">{{ child.label }}</a>
-                                      </li>
+                        <ul class="main-menu">
+                            <li
+                                class="active-menu-removeit"
+                                v-for="links in topNavBarLinks"
+                                :key="links.sort ?? links.label"
+                            >
+                                <a :href="links.href">{{ links.label }}</a>
+                                <ul class="sub-menu" v-if="links.child.length > 0">
+                                    <li
+                                        v-for="child in links.child"
+                                        :key="child.sort ?? child.label"
+                                    >
+                                        <a :href="child.href">{{ child.label }}</a>
+                                    </li>
                                 </ul>
                             </li>
                         </ul>
@@ -170,22 +170,18 @@ export default {
     setup() {
         const store = useStore();
         const router = useRouter();
-
         const isFixed = ref(false);
         const windowScrollY = ref(40);
         const cart = computed(() => store.getters.cart || { count: 0 });
         const cartCount = computed(() => cart.value.count || 0);
         const isLoggedIn = ref(Boolean(typeof window !== 'undefined' && window.Laravel && window.Laravel.isLoggedin));
-
         const handleScroll = () => {
             isFixed.value = window.scrollY >= 40;
             windowScrollY.value = window.scrollY < 40 ? 40 - window.scrollY : 0;
         };
-
         const openCartModal = () => {
             bus.emit('toggle-cart-modal');
         };
-
         const handleLogout = async (event) => {
             event.preventDefault();
             try {
@@ -205,17 +201,13 @@ export default {
                 }
             }
         };
-
         const topNavBarLinks = computed(() => store.getters.topNavBarLinks || []);
-
         onMounted(() => {
             window.addEventListener('scroll', handleScroll);
         });
-
         onUnmounted(() => {
             window.removeEventListener('scroll', handleScroll);
         });
-
         return {
             isFixed,
             windowScrollY,
@@ -226,7 +218,7 @@ export default {
             openCartModal,
             handleLogout,
         };
-    }
+    },
 };
 </script>
 

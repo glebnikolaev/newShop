@@ -136,11 +136,11 @@
                     </a>
                 </div>
 
-                  <p class="stext-107 cl6 txt-center">
-                      Copyright &copy; {{ year }} Gleb. All rights reserved | This template is made with
-                      <i class="fa fa-heart-o" aria-hidden="true"></i> by
-                      <a href="#" target="_blank">Cartiny</a>
-                  </p>
+                <p class="stext-107 cl6 txt-center">
+                    Copyright &copy; {{ year }} Gleb. All rights reserved | This template is made with
+                    <i class="fa fa-heart-o" aria-hidden="true"></i> by
+                    <a href="#" target="_blank">Cartiny</a>
+                </p>
             </div>
         </div>
     </footer>
@@ -153,7 +153,6 @@ export default {
     name: 'footerBar',
     setup() {
         const year = computed(() => new Date().getFullYear());
-
         return {
             year,
         };

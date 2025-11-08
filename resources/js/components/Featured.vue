@@ -5,16 +5,15 @@
                 <h3 class="ltext-103 cl5">Рекомендуем</h3>
             </div>
             <div class="row isotope-grid">
-                  <div
-                      v-for="product in featuredProducts"
-                      :key="product.id || product.slug || product.name"
-                      class="col-sm-6 col-md-4 col-lg-3 p-b-35 isotope-item"
-                  >
+                <div v-for="product in featuredProducts"
+                    :key="product.id || product.slug || product.name"
+                    class="col-sm-6 col-md-4 col-lg-3 p-b-35 isotope-item"
+                >
                     <div class="block2">
                         <div class="block2-pic hov-img0">
                             <img
-                                 :src="product.image ? product.image : '/photos/1/no-photo.jpg'"
-                                 :alt="product.name"
+                                :src="product.image ? product.image : '/photos/1/no-photo.jpg'"
+                                :alt="product.name"
                             />
                             <a href="#" @click.prevent='openProductModal(product)'
                                class="block2-btn flex-c-m stext-103 cl2 size-102 bg0 bor2 hov-btn1 p-lr-15 trans-04">
@@ -25,7 +24,7 @@
                         <div class="block2-txt flex-w flex-t p-t-14">
                             <div class="block2-txt-child1 flex-col-l ">
                                 <a @click.prevent='openProductModal(product)' class="stext-104 cl4 hov-cl1 trans-04 js-name-b2 p-b-6">
-                                    {{product.name}}
+                                    {{ product.name }}
                                 </a>
 
                                 <span class="stext-105 cl3">{{ parseInt(product.price) }} ₽</span>
@@ -60,7 +59,6 @@ export default {
     setup() {
         const store = useStore();
         const featuredProducts = ref([]);
-
         const loadFeaturedProducts = async () => {
             try {
                 featuredProducts.value = await fetchFeatured();
@@ -71,16 +69,13 @@ export default {
                 }
             }
         };
-
         onMounted(() => {
             loadFeaturedProducts();
         });
-
         const openProductModal = (product) => {
             store.dispatch('setProduct', product);
             bus.emit('toggle-product-modal');
         };
-
         return {
             featuredProducts,
             openProductModal,

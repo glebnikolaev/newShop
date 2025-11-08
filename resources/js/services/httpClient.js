@@ -7,7 +7,6 @@ const httpClient = axios.create({
         'X-Requested-With': 'XMLHttpRequest',
     },
 });
-
 httpClient.interceptors.response.use(
     (response) => response,
     (error) => {
@@ -17,5 +16,4 @@ httpClient.interceptors.response.use(
         return Promise.reject(error);
     },
 );
-
 export default httpClient;

@@ -10,14 +10,16 @@
                 <div class="flex-w flex-l-m filter-tope-group m-tb-10">
                     <button class="stext-106 cl6 hov1 bor3 trans-04 m-r-32 m-tb-5"
                             @click="filter = 'All'"
-                            :class="{ 'how-active1': filter ==='All' }">Все меню</button>
+                            :class="{ 'how-active1': filter ==='All' }">Все меню
+                    </button>
 
                     <button v-for="(category, index) in categories"
                             :key="category && category.id ? category.id : index"
                             v-if="category && category.products && category.products.length > 0"
                             @click="filter = category.slug; active = index;"
                             :class="{ 'how-active1': (category && category.slug) === filter }"
-                            class="stext-106 cl6 hov1 bor3 trans-04 m-r-32 m-tb-5">{{ category.name }}</button>
+                            class="stext-106 cl6 hov1 bor3 trans-04 m-r-32 m-tb-5">{{ category.name }}
+                    </button>
                 </div>
 
                 <div class="flex-w flex-c-m m-tb-10">
@@ -244,42 +246,44 @@
             <div class="row isotope-grid">
                 <template v-for="(category, index) in filteredCategories" :key="category && category.id ? category.id : index">
                     <template v-if="category && category.products && category.products.length">
-                        <div v-for="(product, pIndex) in category.products" :key="product && product.id ? product.id : pIndex" class="col-sm-6 col-md-4 col-lg-3 p-b-35 isotope-item">
-                         <!-- Block2 -->
-                         <div class="block2">
-                            <div class="block2-pic hov-img0">
-                                <img
-                                     :src="product.image ? product.image : '/photos/1/no-photo.jpg'"
-                                     :alt="product.name"/>
-                                <a href="#" @click.prevent='openProductModal(product)'
-                                   class="block2-btn flex-c-m stext-103 cl2 size-102 bg0 bor2 hov-btn1 p-lr-15 trans-04">
-                                    Быстрый просмотр
-                                </a>
-                            </div>
-
-                            <div class="block2-txt flex-w flex-t p-t-14">
-                                <div class="block2-txt-child1 flex-col-l ">
-                                    <a href="#" @click.prevent='openProductModal(product)' class="stext-104 cl4 hov-cl1 trans-04 js-name-b2 p-b-6">
-                                        {{product.name}}
-                                    </a>
-
-                                    <span class="stext-105 cl3">{{ parseInt(product.price) }} ₽</span>
-                                </div>
-
-                                <div class="block2-txt-child2 flex-r p-t-3">
-                                    <a href="#" class="btn-addwish-b2 dis-block pos-relative js-addwish-b2">
-                                        <img class="icon-heart1 dis-block trans-04" src="images/icons/icon-heart-01.png"
-                                             alt="ICON">
-                                        <img class="icon-heart2 dis-block trans-04 ab-t-l" src="images/icons/icon-heart-02.png"
-                                             alt="ICON">
+                        <div v-for="(product, pIndex) in category.products" :key="product && product.id ? product.id : pIndex"
+                             class="col-sm-6 col-md-4 col-lg-3 p-b-35 isotope-item">
+                            <!-- Block2 -->
+                            <div class="block2">
+                                <div class="block2-pic hov-img0">
+                                    <img
+                                        :src="product.image ? product.image : '/photos/1/no-photo.jpg'"
+                                        :alt="product.name"/>
+                                    <a href="#" @click.prevent='openProductModal(product)'
+                                       class="block2-btn flex-c-m stext-103 cl2 size-102 bg0 bor2 hov-btn1 p-lr-15 trans-04">
+                                        Быстрый просмотр
                                     </a>
                                 </div>
+
+                                <div class="block2-txt flex-w flex-t p-t-14">
+                                    <div class="block2-txt-child1 flex-col-l ">
+                                        <a href="#" @click.prevent='openProductModal(product)'
+                                           class="stext-104 cl4 hov-cl1 trans-04 js-name-b2 p-b-6">
+                                            {{ product.name }}
+                                        </a>
+
+                                        <span class="stext-105 cl3">{{ parseInt(product.price) }} ₽</span>
+                                    </div>
+
+                                    <div class="block2-txt-child2 flex-r p-t-3">
+                                        <a href="#" class="btn-addwish-b2 dis-block pos-relative js-addwish-b2">
+                                            <img class="icon-heart1 dis-block trans-04" src="images/icons/icon-heart-01.png"
+                                                 alt="ICON">
+                                            <img class="icon-heart2 dis-block trans-04 ab-t-l" src="images/icons/icon-heart-02.png"
+                                                 alt="ICON">
+                                        </a>
+                                    </div>
+                                </div>
                             </div>
-                         </div>
                         </div>
                     </template>
                 </template>
-             </div>
+            </div>
 
             <!-- Load more -->
             <div class="flex-c-m flex-w w-full p-t-45"
@@ -303,7 +307,6 @@ export default {
         const store = useStore();
         const categories = ref([]);
         const filter = ref('All');
-
         const loadCategories = async () => {
             try {
                 categories.value = await fetchCategories();
@@ -314,28 +317,22 @@ export default {
                 }
             }
         };
-
         onMounted(() => {
             loadCategories();
         });
-
         const filteredCategories = computed(() => {
             if (!Array.isArray(categories.value)) {
                 return [];
             }
-
             if (filter.value === 'All') {
                 return categories.value;
             }
-
             return categories.value.filter((category) => category && category.slug === filter.value);
         });
-
         const openProductModal = (product) => {
             store.dispatch('setProduct', product);
             bus.emit('toggle-product-modal');
         };
-
         return {
             categories,
             filter,
