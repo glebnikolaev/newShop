@@ -3,7 +3,9 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Product extends Model
 {
@@ -20,7 +22,7 @@ class Product extends Model
     /**
      * Get the categories record associated with the product.
      */
-    public function categories(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    public function categories(): BelongsToMany
     {
         return $this->belongsToMany(Category::class, 'category_product');
     }
@@ -28,7 +30,7 @@ class Product extends Model
     /**
      * Get the options record associated with the product.
      */
-    public function options(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    public function options(): BelongsToMany
     {
         return $this->belongsToMany(Option::class, 'options_products');
     }
@@ -44,7 +46,7 @@ class Product extends Model
     /**
      * Get the price record associated with the product.
      */
-    public function expert(): \Illuminate\Database\Eloquent\Relations\HasOne
+    public function expert(): HasOne
     {
         return $this->hasOne(ExpertProduct::class, 'product_id', 'expert_id');
     }

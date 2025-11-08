@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Variation extends Model
 {
@@ -11,17 +12,9 @@ class Variation extends Model
     /**
      * Get the options record associated with the product.
      */
-    public function option()
+    public function option(): Variation|HasOne
     {
         return $this->hasOne(Option::class, 'id', 'option_id');
-    }
-
-    /**
-     * Get the price record associated with the product.
-     */
-    public function expert()
-    {
-        return $this->hasOne(ExpertProduct::class, 'product_id', 'expert_id');
     }
 
     public function getOptionNameAttribute()

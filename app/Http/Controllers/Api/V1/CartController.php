@@ -11,7 +11,6 @@ use Darryldecode\Cart\CartCondition;
 
 class CartController extends Controller
 {
-
     /**
      * Получить список корзины
      *
@@ -24,12 +23,12 @@ class CartController extends Controller
         return new CartCollection($cartCollection);
     }
 
-
     /**
      * Добавляем товар в корзину
      *
      * @param AddToCartRequest $request
      * @return CartCollection
+     * @throws \Darryldecode\Cart\Exceptions\InvalidItemException
      */
     public function addToCart(AddToCartRequest $request): CartCollection
     {
@@ -52,7 +51,7 @@ class CartController extends Controller
      * @param array $requestedProduct
      * @return array
      */
-    private function prepareCartProduct(array $requestedProduct) :array
+    private function prepareCartProduct(array $requestedProduct): array
     {
         $product = Product::find($requestedProduct['id']);
         $options = $requestedProduct['options'];
@@ -63,7 +62,7 @@ class CartController extends Controller
         $optionsParametersIds = array_column($options, 'id') ?? [];
         $optionParameters = OptionParameter::whereIn('id', $optionsParametersIds)->with('variation')->get();
 
-        foreach($optionParameters as $optionParameter) {
+        foreach ($optionParameters as $optionParameter) {
             $itemId .= '-'.$optionParameter->variation->id;
             $productPrice += $optionParameter->variation->price;
         }
@@ -73,7 +72,7 @@ class CartController extends Controller
             'name' => $product->name,
             'price' => $productPrice,
             'quantity' => $quantity,
-            'attributes' => $optionParameters
+            'attributes' => $optionParameters,
         ];
     }
 }
