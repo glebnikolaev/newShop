@@ -10,10 +10,8 @@ class WishListProvider extends ServiceProvider
 {
     /**
      * Bootstrap the application services.
-     *
-     * @return void
      */
-    public function boot()
+    public function boot(): void
     {
         //
     }
@@ -21,12 +19,10 @@ class WishListProvider extends ServiceProvider
     /**
      * Register the application services.
      *
-     * @return void
      */
-    public function register()
+    public function register(): void
     {
-        $this->app->singleton('wishlist', function($app)
-        {
+        $this->app->singleton('wishlist', function ($app) {
             $storage = new DBStorage();
             $events = $app['events'];
             $instanceName = 'cart_2';
