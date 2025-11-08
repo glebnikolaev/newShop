@@ -1,5 +1,11 @@
 <?php
 
+use App\Http\Controllers\Api\V1\BannersController;
+use App\Http\Controllers\Api\V1\CartController;
+use App\Http\Controllers\Api\V1\CategoriesController;
+use App\Http\Controllers\Api\V1\ProductsController;
+use App\Http\Controllers\Api\V1\UserController;
+use App\Http\Controllers\Api\V1\Modules\FeaturedController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -13,25 +19,25 @@ use Illuminate\Support\Facades\Route;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
-Route::group(['prefix' => '/v1', 'namespace' => 'App\Http\Controllers\Api\V1', 'as' => 'api.'], function () {
-    Route::get('banners', 'BannersController@index');
-    Route::get('categories', 'CategoriesController@index');
-    Route::get('products', 'ProductsController@index');
+Route::prefix('v1')->name('api.')->group(function () {
+    Route::get('banners', [BannersController::class, 'index']);
+    Route::get('categories', [CategoriesController::class, 'index']);
+    Route::get('products', [ProductsController::class, 'index']);
 
-    Route::post('login', 'UserController@login')->name('login');
-    Route::post('register', 'UserController@register')->name('registers');
-    Route::post('logout', 'UserController@logout')->name('logout')->middleware('auth:sanctum');
+    Route::post('login', [UserController::class, 'login'])->name('login');
+    Route::post('register', [UserController::class, 'register'])->name('registers');
+    Route::post('logout', [UserController::class, 'logout'])->name('logout')->middleware('auth:sanctum');
+
+    Route::prefix('modules')->group(function () {
+        Route::get('featured', [FeaturedController::class, 'index']);
+    });
+
+    Route::prefix('cart')->group(function () {
+        Route::post('add-to-cart', [CartController::class, 'addToCart']);
+        Route::get('get-cart', [CartController::class, 'getCart']);
+    });
 });
 
-Route::group(['prefix' => '/v1/modules', 'namespace' => 'App\Http\Controllers\Api\V1\Modules', 'as' => 'api.'], function () {
-    Route::get('featured', 'FeaturedController@index');
-});
-
-Route::group(['prefix' => '/v1/cart', 'namespace' => 'App\Http\Controllers\Api\V1', 'as' => 'api.'], function () {
-    Route::post('add-to-cart', 'CartController@addToCart');
-    Route::get('get-cart', 'CartController@getCart');
-});
-
-Route::middleware('auth:api')->get('/user', function (Request $request) {
+Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });

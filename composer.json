@@ -5,28 +5,26 @@
     "keywords": ["framework", "laravel"],
     "license": "MIT",
     "require": {
-        "php": "^7.3|^8.0",
+        "php": "^8.0.2",
         "darryldecode/cart": "^4.2",
-        "fruitcake/laravel-cors": "^2.0",
-        "fideloper/proxy": "^4.4",
         "guzzlehttp/guzzle": "^7.0.1",
-        "laravel/fortify": "^1.7",
-        "laravel/framework": "^8.12",
-        "laravel/sanctum": "^2.10",
-        "laravel/telescope": "^4.4",
-        "laravel/tinker": "^2.5"
+        "laravel/fortify": "^1.15",
+        "laravel/framework": "^9.0",
+        "laravel/sanctum": "^2.14.1",
+        "laravel/telescope": "^4.9",
+        "laravel/tinker": "^2.7"
     },
     "require-dev": {
-        "barryvdh/laravel-ide-helper": "^2.12",
-        "facade/ignition": "^2.5",
+        "barryvdh/laravel-ide-helper": "^2.13",
         "fakerphp/faker": "^1.9.1",
-        "laravel/sail": "^1.0.1",
-        "mockery/mockery": "^1.4.2",
-        "nunomaduro/collision": "^5.0",
-        "phpunit/phpunit": "^9.3.3",
+        "friendsofphp/php-cs-fixer": "^3.0",
+        "laravel/sail": "^1.13",
+        "mockery/mockery": "^1.4.4",
+        "nunomaduro/collision": "^6.4",
         "phpstan/phpstan": "^1.11",
-        "squizlabs/php_codesniffer": "^3.8",
-        "friendsofphp/php-cs-fixer": "^3.0"
+        "phpunit/phpunit": "^9.5.10",
+        "spatie/laravel-ignition": "^1.0",
+        "squizlabs/php_codesniffer": "^3.8"
     },
     "autoload": {
         "psr-4": {
@@ -60,7 +58,10 @@
     "config": {
         "optimize-autoloader": true,
         "preferred-install": "dist",
-        "sort-packages": true
+        "sort-packages": true,
+        "allow-plugins": {
+            "composer/package-versions-deprecated": true
+        }
     },
     "minimum-stability": "dev",
     "prefer-stable": true
