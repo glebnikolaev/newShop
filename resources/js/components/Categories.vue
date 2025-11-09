@@ -3,7 +3,7 @@
     <section class="bg0 p-t-100 p-b-140">
         <div class="container">
             <div class="p-b-10">
-                <h3 class="ltext-103 cl5">Меню доставки</h3>
+                <h3 class="ltext-103 cl5">Каталог</h3>
             </div>
 
             <div class="flex-w flex-sb-m p-b-52">
@@ -14,12 +14,11 @@
                     </button>
 
                     <button v-for="(category, index) in categories"
-                            :key="category && category.id ? category.id : index"
-                            v-if="category && category.products && category.products.length > 0"
+                            :item="category"
+                            :key="index"
                             @click="filter = category.slug; active = index;"
-                            :class="{ 'how-active1': (category && category.slug) === filter }"
-                            class="stext-106 cl6 hov1 bor3 trans-04 m-r-32 m-tb-5">{{ category.name }}
-                    </button>
+                            :class="{ 'how-active1': category.slug === filter }"
+                            class="stext-106 cl6 hov1 bor3 trans-04 m-r-32 m-tb-5">{{ category.name }}</button>
                 </div>
 
                 <div class="flex-w flex-c-m m-tb-10">

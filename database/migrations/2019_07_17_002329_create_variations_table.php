@@ -16,8 +16,7 @@ class CreateVariationsTable extends Migration
         Schema::create('variations', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedInteger('option_parameter_id');
-            $table->decimal('price', 6,2)->default(0);
-            $table->string('expert_id')->nullable();
+            $table->decimal('price', 6)->default(0);
             $table->timestamps();
         });
     }

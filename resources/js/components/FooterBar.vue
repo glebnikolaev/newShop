@@ -139,7 +139,7 @@
                 <p class="stext-107 cl6 txt-center">
                     Copyright &copy; {{ year }} Gleb. All rights reserved | This template is made with
                     <i class="fa fa-heart-o" aria-hidden="true"></i> by
-                    <a href="#" target="_blank">Cartiny</a>
+                    <a href="#" target="_blank">Cartini</a>
                 </p>
             </div>
         </div>

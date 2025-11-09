@@ -15,9 +15,8 @@ class CreateProductsTable extends Migration
     {
         Schema::create('products', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->unsignedInteger('expert_id')->nullable();
             $table->tinyInteger('type')->default(0);
-            $table->decimal('price', 6,2)->default(0);
+            $table->decimal('price', 6)->default(0);
             $table->string('image')->nullable();
             $table->string('name')->nullable();
             $table->string('weight')->nullable();

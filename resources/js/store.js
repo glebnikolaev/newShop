@@ -58,9 +58,10 @@ export default createStore({
         isFooterBarVisible: true,
 
         topNavBarLinks: [
-            { sort: 0, label: 'Главная', href: '', child: [] },
-            { sort: 1, label: 'Доставка и оплата', href: '', child: [] },
-            { sort: 2, label: 'Контакты', href: '', child: [] },
+            { sort: 0, label: 'Главная', href: '/', child: [] },
+            { sort: 1, label: 'Каталог', href: '/catalog', child: [] },
+            { sort: 2, label: 'Доставка и оплата', href: '', child: [] },
+            { sort: 3, label: 'Контакты', href: '', child: [] },
         ],
         cart: defaultCartState(),
         product: defaultProductState(),

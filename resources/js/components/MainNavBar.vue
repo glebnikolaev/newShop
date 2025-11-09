@@ -6,16 +6,14 @@
             <div class="top-bar">
                 <div class="content-topbar flex-sb-m h-full container">
                     <div class="left-top-bar">АКЦИЯ: при регистрации 100 приветственных баллов в подарок</div>
-
                     <div class="right-top-bar flex-w h-full">
-                        <a href="#" class="flex-c-m trans-04 p-lr-25">Написать Директору</a>
-                        <a href="#" class="flex-c-m trans-04 p-lr-25">Личный кабинет</a>
                         <template v-if="isLoggedIn">
-                            <a v-if="isLoggedIn" class="nav-item nav-link" @click="handleLogout">Выйти</a>
+                            <a href="#" class="flex-c-m trans-04 p-lr-25">Личный кабинет</a>
+                            <a v-if="isLoggedIn" class="flex-c-m trans-04 p-lr-25" @click="handleLogout">Выйти</a>
                         </template>
                         <template v-else>
-                            <router-link to="/login" class="nav-item nav-link">Войти</router-link>
-                            <router-link to="/register" class="nav-item nav-link">Регистрация</router-link>
+                            <router-link to="/login" class="flex-c-m trans-04 p-lr-25">Войти</router-link>
+                            <router-link to="/register" class="flex-c-m trans-04 p-lr-25">Регистрация</router-link>
                         </template>
                     </div>
                 </div>
@@ -23,24 +21,18 @@
 
             <div class="wrap-menu-desktop" v-bind:style="{ top: windowScrollY + 'px' }">
                 <nav class="limiter-menu-desktop container">
-
                     <!-- Logo desktop -->
-                    <a href="#" class="logo">
-                        <img src="images/icons/logo-01.png" alt="IMG-LOGO">
-                    </a>
+                    <router-link to="/" class="logo">
+                        <img src="images/icons/logo.png" alt="">
+                    </router-link>
                     <div class="menu-desktop">
                         <ul class="main-menu">
-                            <li
-                                class="active-menu-removeit"
-                                v-for="links in topNavBarLinks"
+                            <li v-for="links in topNavBarLinks"  class="active-menu-removeit"
                                 :key="links.sort ?? links.label"
                             >
-                                <a :href="links.href">{{ links.label }}</a>
+                                <router-link :to="links.href" class="nav-item nav-link">{{ links.label }}</router-link>
                                 <ul class="sub-menu" v-if="links.child.length > 0">
-                                    <li
-                                        v-for="child in links.child"
-                                        :key="child.sort ?? child.label"
-                                    >
+                                    <li v-for="child in links.child" :key="child.sort ?? child.label">
                                         <a :href="child.href">{{ child.label }}</a>
                                     </li>
                                 </ul>
